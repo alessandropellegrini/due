@@ -46,7 +46,6 @@ def encode(message):
     if message.startswith('con cesare'):
         code = [int(s) for s in message[10:].lstrip() if s.isdigit()]
         enc, dec = caesar(code[0])
-        print(message[10:].lstrip()[len(str(code[0])):])
         return enc(message[10:].lstrip()[len(str(code[0])):])
 
 
@@ -87,9 +86,9 @@ def process(bot):
 
             # Check for specific commands
             if message.startswith('codifica'):
-                reply += encode(message[8:].lstrip())
+                reply += encode(message[8:].lstrip().encode('utf-8', 'ignore'))
             elif message.startswith('decodifica'):
-                reply += decode(message[10:].lstrip())
+                reply += decode(message[10:].lstrip().encode('utf-8', 'ignore'))
             else:
                 reply += generate_reply(message.encode('utf-8', 'ignore'))
 
