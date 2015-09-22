@@ -91,10 +91,15 @@ def process(bot):
             elif message.startswith('decodifica'):
                 reply += decode(message[10:].lstrip())
             else:
-                reply += generate_reply(message)
+                reply += generate_reply(message.encode('utf-8', 'ignore'))
+
+            # Sanitize unwanted characters
+            for ch in ['&','#',')','(']:
+                if ch in reply:
+                    reply=reply.replace(ch,'')
 
             # Reply the message
-            bot.sendMessage(chat_id=chat_id, text=reply.encode('utf-8'))
+            bot.sendMessage(chat_id=chat_id, text=reply.encode('utf-8', 'ignore'))
 
 
 if __name__ == '__main__':

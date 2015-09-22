@@ -11,6 +11,8 @@ def nextword(a):
         return 'il'
 
 def generate_reply(message):
+    if not message:
+        message = "testo"
     s=random.choice(message.split())
     response=''
     while True:
