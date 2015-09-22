@@ -12,7 +12,9 @@
 
 import logging
 import telegram
+import random
 from caesar import caesar
+from chatbot import generate_reply
 
 LAST_UPDATE_ID = None
 
@@ -64,7 +66,8 @@ def process(bot):
     for update in bot.getUpdates(offset=LAST_UPDATE_ID, timeout=10):
         # chat_id is required to reply any message
         chat_id = update.message.chat_id
-        message = update.message.text.encode('utf-8').lower()
+        username = update.message.from_user
+        message = update.message.text.lower()
 
         if (message):
             # Updates global offset to get the new updates
@@ -77,16 +80,21 @@ def process(bot):
             # Remove my name from message and leading spaces
             message = message[4:].lstrip()
 
+            # Be polite: reply to the user who wrote you (with some probability)
+            reply = ''
+            if random.random() < 0.3:
+                reply = username.first_name + ', '
+
             # Check for specific commands
             if message.startswith('codifica'):
-                reply = encode(message[8:].lstrip())
+                reply += encode(message[8:].lstrip())
             elif message.startswith('decodifica'):
-                reply = decode(message[10:].lstrip())
+                reply += decode(message[10:].lstrip())
             else:
-                reply = message
+                reply += generate_reply(message)
 
             # Reply the message
-            bot.sendMessage(chat_id=chat_id, text=reply)
+            bot.sendMessage(chat_id=chat_id, text=reply.encode('utf-8'))
 
 
 if __name__ == '__main__':
