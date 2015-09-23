@@ -66,7 +66,7 @@ def process(bot):
         # chat_id is required to reply any message
         chat_id = update.message.chat_id
         username = update.message.from_user
-        message = update.message.text.lower()
+        message = update.message.text.lower().encode('utf-8', 'ignore')
 
         if (message):
             # Updates global offset to get the new updates
@@ -86,19 +86,29 @@ def process(bot):
 
             # Check for specific commands
             if message.startswith('codifica'):
-                reply += encode(message[8:].lstrip().encode('utf-8', 'ignore'))
+                reply += encode(message[8:].lstrip())
             elif message.startswith('decodifica'):
-                reply += decode(message[10:].lstrip().encode('utf-8', 'ignore'))
+                reply += decode(message[10:].lstrip())
             else:
-                reply += generate_reply(message.encode('utf-8', 'ignore'))
+                while 1:
+                    try:
+                        # Attempt to reconvert the string to utf-8 (telegram wants this)
+                        sentence = generate_reply(message.encode('latin-1', 'ignore')).encode('utf-8', 'ignore')
+                        break
+                    except UnicodeDecodeError:
+                        continue
 
-            # Sanitize unwanted characters
-            for ch in ['&','#',')','(']:
+                reply += sentence
+
+            # Sanitize unwanted characters and make lowercase
+            for ch in ['&','#',')','(','"']:
                 if ch in reply:
                     reply=reply.replace(ch,'')
 
+            reply = reply.lower()
+
             # Reply the message
-            bot.sendMessage(chat_id=chat_id, text=reply.encode('utf-8', 'ignore'))
+            bot.sendMessage(chat_id=chat_id, text=reply)
 
 
 if __name__ == '__main__':

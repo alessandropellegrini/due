@@ -5,7 +5,7 @@ import pickle,random
 successorlist=pickle.load(open('training-set','rb'))
 
 def nextword(a):
-    if a in successorlist:
+    if a in successorlist and successorlist[a]:
         return random.choice(successorlist[a])
     else:
         return 'il'
